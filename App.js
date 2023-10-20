@@ -4,6 +4,9 @@ import SearchIcon from "react-native-vector-icons/EvilIcons";
 import { REACT_APP_API_KEY } from "@env";
 
 export default function App() {
+  const [matches, setMatches] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all";
   const options = {
     method: "GET",
@@ -12,9 +15,6 @@ export default function App() {
       "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com",
     },
   };
-
-  const [matches, setMatches] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const getMatches = async () => {
     try {
