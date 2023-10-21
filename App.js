@@ -1,11 +1,11 @@
-import { View, SafeAreaView, TextInput, Text, Image } from "react-native";
+import { View, SafeAreaView, Text, ScrollView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
-import SearchIcon from "react-native-vector-icons/EvilIcons";
 import { REACT_APP_API_KEY } from "@env";
 
 export default function App() {
   const [matches, setMatches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const uniqueLeagues = [...new Set(matches.map((match) => match.league.name))];
 
   const url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all";
   const options = {
@@ -39,11 +39,21 @@ export default function App() {
 
   return (
     <SafeAreaView className="w-screen h-screen bg-gray-100">
-      <View className="flex flex-row border border-gray-300 w-8/12 mx-auto p-2 rounded-3xl text-gray-300">
-        <SearchIcon name="search" size={30} color="rgb(229 231 235)" />
-        <TextInput placeholder="Search..." className=" w-10/12" />
-      </View>
-      <View className="flex flex-col mt-10">
+      <ScrollView
+        horizontal
+        persistentScrollbar={false}
+        className="gap-3 pl-5 my-2"
+      >
+        <View className="px-4 py-2 bg-slate-400 mx-2 rounded-3xl">
+          <Text className="text-white">All</Text>
+        </View>
+        {uniqueLeagues.map((league, index) => (
+          <View key={index} className="px-4 py-2 bg-slate-200 mx-2 rounded-3xl">
+            <Text>{league}</Text>
+          </View>
+        ))}
+      </ScrollView>
+      <ScrollView className="flex flex-col">
         <Text className="ml-5 font-bold text-3xl">Live Matches</Text>
         {isLoading ? (
           <Text>Loading ...</Text>
@@ -51,26 +61,57 @@ export default function App() {
           matches.map((match, index) => (
             <View
               key={index}
-              className="w-10/12 flex flex-row p-4  rounded-2xl mx-auto mt-5 bg-white shadow-lg"
+              className="w-10/12 flex flex-col p-4  rounded-2xl mx-auto mt-5 bg-white shadow-lg"
             >
-              <View className="w-1/3 ">
-                <Text className="text-xs text-center">
-                  {match.teams.home.name}
-                </Text>
-                <Text className="text-right text-xl font-bold mt-3">
-                  {match.goals.home}
-                </Text>
-              </View>
-              <View className="w-1/3 ">
-                <Text className="text-center">vs</Text>
-              </View>
-              <View className="w-1/3 ">
-                <Text className="text-xs text-center">
-                  {match.teams.away.name}
-                </Text>
-                <Text className="text-left text-xl font-bold mt-3">
-                  {match.goals.away}
-                </Text>
+              <Text className="text-center mb-3 font-bold">
+                {match.league.name}
+              </Text>
+              <View className="flex flex-row">
+                <View className="w-1/3 flex items-center justify-center">
+                  <Text>{match.teams.home.name}</Text>
+                  <Image
+                    source={{ uri: match.teams.home.logo }}
+                    width={40}
+                    height={40}
+                  />
+                  {match.events.map(
+                    (event, index) =>
+                      event.type === "Goal" &&
+                      event.team.id === match.teams.home.id && (
+                        <Text
+                          key={index}
+                          className="text-end text-xs text-gray-400"
+                        >
+                          {event.player.name} {event.time.elapsed}'
+                        </Text>
+                      )
+                  )}
+                </View>
+                <View className="w-1/3 ">
+                  <Text className="text-center font-bold text-xl">
+                    {match.goals.home} - {match.goals.away}
+                  </Text>
+                </View>
+                <View className="w-1/3 flex items-center justify-center">
+                  <Text className="text-end">{match.teams.away.name}</Text>
+                  <Image
+                    source={{ uri: match.teams.away.logo }}
+                    width={40}
+                    height={40}
+                  />
+                  {match.events.map(
+                    (event, index) =>
+                      event.type === "Goal" &&
+                      event.team.id === match.teams.away.id && (
+                        <Text
+                          key={index}
+                          className="text-end text-xs text-gray-400"
+                        >
+                          {event.player.name} {event.time.elapsed}'
+                        </Text>
+                      )
+                  )}
+                </View>
               </View>
             </View>
           ))
@@ -79,11 +120,7 @@ export default function App() {
             <Text className="text-gray-600">No matches available</Text>
           </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
-
-// Designing the UI
-// Search bar on top
-// List of matches
