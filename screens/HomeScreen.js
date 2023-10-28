@@ -46,21 +46,40 @@ export default function App({ navigation }) {
 
   return (
     <SafeAreaView className="w-screen h-screen bg-gray-100">
-      <ScrollView
-        horizontal
-        persistentScrollbar={false}
-        className="gap-3 pl-5 my-2"
-      >
-        <View className="px-4 py-2 bg-slate-400 mx-2 rounded-3xl">
-          <Text className="text-white">All</Text>
-        </View>
-        {uniqueLeagues.map((league, index) => (
-          <View key={index} className="px-4 py-2 bg-slate-200 mx-2 rounded-3xl">
-            <Text>{league}</Text>
-          </View>
-        ))}
-      </ScrollView>
-      <ScrollView className="flex flex-col">
+      <View>
+        <ScrollView
+          horizontal
+          persistentScrollbar={false}
+          className="gap-3 pl-5 my-2"
+        >
+          <Pressable
+            onPress={() => {
+              setIsLoading(true);
+              getMatches();
+            }}
+            className="px-4 py-2 bg-slate-400 mx-2 rounded-3xl"
+            style={{
+              height: "auto",
+            }}
+          >
+            <Text className="text-white">All</Text>
+          </Pressable>
+          {uniqueLeagues.map((league, index) => (
+            <Pressable
+              onPress={() =>
+                setMatches(
+                  matches.filter((match) => match.league.name === league)
+                )
+              }
+              key={index}
+              className="px-4 py-2 bg-slate-200 mx-2 rounded-3xl"
+            >
+              <Text>{league}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+      <ScrollView className="flex flex-col h-5/6">
         <Text className="ml-5 font-bold text-3xl">Live Matches</Text>
         {isLoading ? (
           <Text>Loading ...</Text>
